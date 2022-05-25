@@ -1,6 +1,6 @@
-import 'package:example/grid_example.dart';
-import 'package:example/list_example.dart';
 import 'package:flutter/material.dart';
+import 'grid_example.dart';
+import 'list_example.dart';
 
 void main() {
   runApp(const MyApp());

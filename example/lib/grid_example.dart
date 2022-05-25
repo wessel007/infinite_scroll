@@ -18,6 +18,7 @@ class _GridExampleState extends State<GridExample> {
 
   List<String> data = [];
   bool everyThingLoaded = false;
+  bool pageIsLoaded = false;
 
   @override
   void initState() {
@@ -35,6 +36,7 @@ class _GridExampleState extends State<GridExample> {
         padding: const EdgeInsets.all(10),
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
+        pageIsLoaded: pageIsLoaded,
         children: data
             .map(
               (e) => GridItem(text: e),
@@ -45,6 +47,7 @@ class _GridExampleState extends State<GridExample> {
           setState(() {
             data += newData;
             if (newData.isEmpty) {
+              pageIsLoaded = true;
               everyThingLoaded = true;
             }
           });
@@ -57,7 +60,9 @@ class _GridExampleState extends State<GridExample> {
 
   Future<void> loadInitialData() async {
     data = await getNextPageData(0);
-    setState(() {});
+    setState(() {
+      pageIsLoaded = true;
+    });
   }
 }
 

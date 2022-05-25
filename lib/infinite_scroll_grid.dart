@@ -7,6 +7,7 @@ class InfiniteScrollGrid extends StatefulWidget {
   final List<Widget> children;
   final Function(int page)? onLoadingStart;
   final bool everythingLoaded;
+  final bool pageIsLoaded;
   final EdgeInsetsGeometry? padding;
   final bool shrinkWrap;
   final ScrollPhysics? physics;
@@ -35,6 +36,7 @@ class InfiniteScrollGrid extends StatefulWidget {
     required this.children,
     this.onLoadingStart,
     this.everythingLoaded = false,
+    this.pageIsLoaded = false,
     this.padding,
     this.shrinkWrap = false,
     this.physics,
@@ -73,7 +75,14 @@ class _InfiniteScrollGridState extends State<InfiniteScrollGrid> {
     _removeLoader();
     _sc.addListener(() async {
       if (_sc.position.atEdge && _sc.offset > 0) {
-        if (!widget.everythingLoaded) {
+        if (!widget.everythingLoaded && !widget.pageIsLoaded) {
+          setState(() {
+            _loading = true;
+          });
+
+          await widget.onLoadingStart?.call(page++);
+        }
+        if (!widget.everythingLoaded && widget.pageIsLoaded) {
           setState(() {
             _loading = true;
           });
