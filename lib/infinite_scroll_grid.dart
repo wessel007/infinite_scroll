@@ -7,7 +7,6 @@ class InfiniteScrollGrid extends StatefulWidget {
   final List<Widget> children;
   final Function(int page)? onLoadingStart;
   final bool everythingLoaded;
-  final bool pageIsLoaded;
   final EdgeInsetsGeometry? padding;
   final bool shrinkWrap;
   final ScrollPhysics? physics;
@@ -36,7 +35,6 @@ class InfiniteScrollGrid extends StatefulWidget {
     required this.children,
     this.onLoadingStart,
     this.everythingLoaded = false,
-    this.pageIsLoaded = false,
     this.padding,
     this.shrinkWrap = false,
     this.physics,
@@ -68,6 +66,9 @@ class InfiniteScrollGrid extends StatefulWidget {
 class _InfiniteScrollGridState extends State<InfiniteScrollGrid> {
   final ScrollController _sc = ScrollController();
   bool _loading = true;
+  bool startLoading = false;
+  bool initialLoad = true;
+
   int page = 1;
   @override
   void initState() {
@@ -75,14 +76,7 @@ class _InfiniteScrollGridState extends State<InfiniteScrollGrid> {
     _removeLoader();
     _sc.addListener(() async {
       if (_sc.position.atEdge && _sc.offset > 0) {
-        if (!widget.everythingLoaded && !widget.pageIsLoaded) {
-          setState(() {
-            _loading = true;
-          });
-
-          await widget.onLoadingStart?.call(page++);
-        }
-        if (!widget.everythingLoaded && widget.pageIsLoaded) {
+        if (!widget.everythingLoaded) {
           setState(() {
             _loading = true;
           });
@@ -111,17 +105,29 @@ class _InfiniteScrollGridState extends State<InfiniteScrollGrid> {
     for (Widget child in widget.children) {
       childrens.add(child);
     }
-    if (!widget.everythingLoaded) {
-      childrens.add(
-        widget.loadingWidget ??
-            const Padding(
-              padding: EdgeInsets.all(20),
-              child: Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
-            ),
-      );
+    startLoading = true;
+    return childrens;
+  }
+
+  List<Widget> get getChildrensLoader {
+    List<Widget> childrens = [];
+    for (Widget child in widget.children) {
+      childrens.add(child);
     }
+    if (!widget.everythingLoaded) {
+      initialLoad
+          ? initialLoad = false
+          : childrens.add(
+              widget.loadingWidget ??
+                  const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    ),
+                  ),
+            );
+    }
+    startLoading = false;
 
     return childrens;
   }
@@ -158,7 +164,7 @@ class _InfiniteScrollGridState extends State<InfiniteScrollGrid> {
             shrinkWrap: widget.shrinkWrap,
             crossAxisCount: widget.crossAxisCount,
             // children: widget.children,
-            children: getChildrens,
+            children: startLoading ? getChildrensLoader : getChildrens,
           );
   }
 }
