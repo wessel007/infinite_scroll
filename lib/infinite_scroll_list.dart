@@ -55,6 +55,8 @@ class InfiniteScrollList extends StatefulWidget {
 class _InfiniteScrollListState extends State<InfiniteScrollList> {
   final ScrollController _sc = ScrollController();
   bool _loading = true;
+  bool startLoading = false;
+  bool initialLoad = true;
   int page = 1;
   @override
   void initState() {
@@ -90,17 +92,30 @@ class _InfiniteScrollListState extends State<InfiniteScrollList> {
     for (Widget child in widget.children) {
       childrens.add(child);
     }
-    if (!widget.everythingLoaded) {
-      childrens.add(
-        widget.loadingWidget ??
-            const Padding(
-              padding: EdgeInsets.all(20),
-              child: Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
-            ),
-      );
+    initialLoad = false;
+    startLoading = true;
+    return childrens;
+  }
+
+  List<Widget> get getChildrensLoader {
+    List<Widget> childrens = [];
+    for (Widget child in widget.children) {
+      childrens.add(child);
     }
+    if (!widget.everythingLoaded) {
+      initialLoad
+          ? initialLoad = false
+          : childrens.add(
+              widget.loadingWidget ??
+                  const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    ),
+                  ),
+            );
+    }
+    startLoading = false;
 
     return childrens;
   }
@@ -133,7 +148,7 @@ class _InfiniteScrollListState extends State<InfiniteScrollList> {
             controller: _sc,
             padding: widget.padding,
             shrinkWrap: widget.shrinkWrap,
-            children: getChildrens,
+            children: startLoading ? getChildrensLoader : getChildrens,
           );
   }
 }

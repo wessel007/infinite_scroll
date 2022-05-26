@@ -12,7 +12,7 @@ class _GridExampleState extends State<GridExample> {
   Future<List<String>> getNextPageData(int page) async {
     await Future.delayed(const Duration(seconds: 2));
     if (page == 3) return [];
-    final items = List<String>.generate(17, (i) => "Item $i Page $page");
+    final items = List<String>.generate(1, (i) => "Item $i Page $page");
     return items;
   }
 
