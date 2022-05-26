@@ -105,6 +105,7 @@ class _InfiniteScrollGridState extends State<InfiniteScrollGrid> {
     for (Widget child in widget.children) {
       childrens.add(child);
     }
+    initialLoad = false;
     startLoading = true;
     return childrens;
   }
