@@ -58,6 +58,8 @@ class _InfiniteScrollListState extends State<InfiniteScrollList> {
   bool startLoading = false;
   bool initialLoad = true;
   int page = 1;
+
+  int load = 0;
   @override
   void initState() {
     super.initState();
@@ -88,35 +90,29 @@ class _InfiniteScrollListState extends State<InfiniteScrollList> {
   }
 
   List<Widget> get getChildrens {
-    List<Widget> childrens = [];
-    for (Widget child in widget.children) {
-      childrens.add(child);
-    }
-    initialLoad = false;
-    startLoading = true;
-    return childrens;
-  }
-
-  List<Widget> get getChildrensLoader {
+    load++;
     List<Widget> childrens = [];
     for (Widget child in widget.children) {
       childrens.add(child);
     }
     if (!widget.everythingLoaded) {
-      initialLoad
-          ? initialLoad = false
-          : childrens.add(
-              widget.loadingWidget ??
-                  const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Center(
-                      child: CircularProgressIndicator.adaptive(),
-                    ),
-                  ),
-            );
+      if (initialLoad) {
+        initialLoad = false;
+        load = 2;
+      }
+      if (load == 1) {
+        childrens.add(
+          widget.loadingWidget ??
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(
+                  child: CircularProgressIndicator.adaptive(),
+                ),
+              ),
+        );
+      }
     }
-    startLoading = false;
-
+    if (load == 2) load = 0;
     return childrens;
   }
 
@@ -148,7 +144,7 @@ class _InfiniteScrollListState extends State<InfiniteScrollList> {
             controller: _sc,
             padding: widget.padding,
             shrinkWrap: widget.shrinkWrap,
-            children: startLoading ? getChildrensLoader : getChildrens,
+            children: getChildrens,
           );
   }
 }
